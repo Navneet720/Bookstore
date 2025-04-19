@@ -1,0 +1,31 @@
+#version: "3.8"
+#
+#services:
+#  mysql:
+#    image: mysql:8.0
+#    container_name: mysql-db
+#    ports:
+#      - "3307:3306"
+#    environment:
+#      MYSQL_DATABASE: bookstoredb
+#      MYSQL_ROOT_PASSWORD: 96993123
+#    volumes:
+#      - mysql-data:/var/lib/mysql
+#
+#  app:
+#    build: .
+#    container_name: springboot-bookstore
+#    depends_on:
+#      - mysql
+#    ports:
+#      - "8080:8080"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-db:3306/bookstoredb
+#      SPRING_DATASOURCE_USERNAME: root
+#      SPRING_DATASOURCE_PASSWORD: 96993123
+#      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+#    restart: on-failure
+#    entrypoint: [ "/bin/sh", "-c", "until nc -z mysql-db 3306; do echo waiting for mysql; sleep 2; done; java -jar app.jar" ]
+#
+#volumes:
+#  mysql-data:
