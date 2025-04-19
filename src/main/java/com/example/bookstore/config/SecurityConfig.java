@@ -50,18 +50,19 @@ public class SecurityConfig {
 //                        .anyRequest().authenticated()
 //                )
 
-                .cors(cors -> cors.configure(http)) // ✅ CORS enabled
+                .cors(cors -> cors.configure(http)) //
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ✅ allow all OPTIONS requests
-                        .requestMatchers("/authenticate").permitAll()
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/books/**").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/books/**").permitAll()
-                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").permitAll()
-                        .anyRequest().permitAll()
+                        // Public endpoints
+                        .requestMatchers("/authenticate").permitAll() //
+                        .requestMatchers( "/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/books/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/books/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").authenticated()
 
+                        // Fallback
+                        .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
