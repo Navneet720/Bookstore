@@ -24,13 +24,6 @@ public class BookService {
         return bookRepository.findById(id);
     }
 
-//    public List<Book> userData(){
-//        List<Book> data = new ArrayList<>();
-//        List<Book> books = bookRepository.findByUserIdIn(userIds);
-//        data
-//        return data;
-//    }
-
     public Book saveBook(Book book) {
         return bookRepository.save(book);
     }
@@ -39,13 +32,4 @@ public class BookService {
         bookRepository.deleteById(id);
     }
 
-    public List<String> getUserRoles(String username) {
-        if ("user".equals(username)) {
-            return Arrays.asList("ROLE_USER");
-        } else if ("admin".equals(username)) {
-            return Arrays.asList("ROLE_USER", "ROLE_ADMIN");
-        }
-        System.out.println("rolesbookservice");
-        return Arrays.asList("ROLE_GUEST");
-    }
 }
