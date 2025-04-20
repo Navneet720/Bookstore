@@ -17,6 +17,6 @@ public class SecretKeyGenerator {
         secureRandom.nextBytes(randomBytes);
         String base64SecretKey = Base64.getEncoder().encodeToString(randomBytes);
         System.out.println("Generated Base64 Secret Key: " + base64SecretKey);
-        return "bbxwAmqRt9Rsu+AVzotUtV2uYJjfHrLJD0wHEJcq55k=";
+         return "bbxwAmqRt9Rsu+AVzotUtV2uYJjfHrLJD0wHEJcq55k=";
     }
 }

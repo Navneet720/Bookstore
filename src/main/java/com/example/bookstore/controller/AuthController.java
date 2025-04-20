@@ -6,6 +6,7 @@ import com.example.bookstore.jwt.AuthResponse;
 import com.example.bookstore.jwt.JwtUtil;
 import com.example.bookstore.repository.UserRoleRepository;
 import com.example.bookstore.service.BookService;
+import com.example.bookstore.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 public class AuthController {
+
     @Autowired
     private UserRoleRepository userRoleRepository;
 
@@ -24,8 +26,9 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
+
     @Autowired
-    private BookService bookService;
+    private UserService userService;
 
     @CrossOrigin(origins = "http://localhost:4200")
     @PostMapping("/authenticate")
@@ -34,8 +37,10 @@ public class AuthController {
         System.out.println(authRequest+"-------authrequest");
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-        List<String> roles = bookService.getUserRoles(authRequest.getUsername());
-        final String jwt = jwtUtil.generateToken(authRequest.getUsername(), roles);
+        List<String> dbRoles = userService.getUserRoles(authRequest.getUsername());
+        System.out.println(dbRoles+"<--<Authrolesdb");
+//        List<String> roles = bookService.getUserRoles(authRequest.getUsername());
+        final String jwt = jwtUtil.generateToken(authRequest.getUsername(), dbRoles);
         return ResponseEntity.ok(new AuthResponse(jwt));
     }
 

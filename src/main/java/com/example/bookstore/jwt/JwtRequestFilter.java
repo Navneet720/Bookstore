@@ -57,16 +57,15 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             System.out.println(username + "<==username");
 
             // Retrieve roles from the database
-            // Retrieve roles from the database
             List<String> dbRoles = userService.getUserRoles(username);
             System.out.println(dbRoles + "<==dbRoles");
 
             // Extract roles from the token
 
             List<String> tokenRoles = jwtUtil.extractRoles(jwt); // Implement this method to parse roles from JWT
-            System.out.println(tokenRoles + "<==tokenRoles");
-            System.out.println(jwt + "<==jwt");
-            System.out.println(dbRoles + "<==dbRoles");
+            System.out.println(tokenRoles + "<==tokenRolesss");
+            System.out.println(jwt + "<==jwtss");
+            System.out.println(dbRoles + "<==dbRoless");
             System.out.println(userDetails.getUsername());
 //            if (dbRoles.containsAll(tokenRoles)) {
 //                System.out.println(userDetails.getUsername());
