@@ -4,15 +4,15 @@ import com.example.bookstore.dto.CustomerDTO;
 import com.example.bookstore.model.Customer;
 import com.example.bookstore.repository.CustomerRepository;
 import com.example.bookstore.repository.ProductRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+@Slf4j
 @Service
 public class CustomerService {
-
     private final CustomerRepository customerRepo;
     private final ProductRepository productRepo;
 
@@ -34,6 +34,7 @@ public class CustomerService {
     }
 
     public List<CustomerDTO> getAll() {
+        log.info("CustomerDTO");
         return customerRepo.findAll()
                 .stream()
                 .map(CustomerMapper::toDTO)
