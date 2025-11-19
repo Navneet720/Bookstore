@@ -17,7 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 import java.util.List;
-
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
 
@@ -28,18 +27,27 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private UserService userService; // Inject UserService for database role verification
+    private UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+
+        // ✅ ADD THIS: Skip JWT validation for public endpoints
+        String path = request.getRequestURI();
+        if (path.startsWith("/authenticate") ||
+                path.startsWith("/swagger-ui") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/h2-console")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         final String authorizationHeader = request.getHeader("Authorization");
 
         String username = null;
         String jwt = null;
 
-        // Check if the Authorization header is present and starts with "Bearer "
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             jwt = authorizationHeader.substring(7);
             try {
@@ -50,29 +58,12 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
-        // Check if the username was extracted and no authentication is set in the SecurityContext
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            System.out.println(username + "<==username");
-
-            // Retrieve roles from the database
             List<String> dbRoles = userService.getUserRoles(username);
-            System.out.println(dbRoles + "<==dbRoles");
+            List<String> tokenRoles = jwtUtil.extractRoles(jwt);
 
-            // Extract roles from the token
-
-            List<String> tokenRoles = jwtUtil.extractRoles(jwt); // Implement this method to parse roles from JWT
-            System.out.println(tokenRoles + "<==tokenRolesss");
-            System.out.println(jwt + "<==jwtss");
-            System.out.println(dbRoles + "<==dbRoless");
-            System.out.println(userDetails.getUsername());
-//            if (dbRoles.containsAll(tokenRoles)) {
-//                System.out.println(userDetails.getUsername());
-//
-////    return;return
-//            }
-            // Verify that roles in the token match roles in the database
             if (jwtUtil.validateToken(jwt, userDetails.getUsername())) {
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
@@ -84,7 +75,6 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         }
 
-        // Continue with the filter chain
         chain.doFilter(request, response);
     }
 }

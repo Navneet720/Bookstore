@@ -10,11 +10,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -37,80 +34,42 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-//                .cors(cors -> cors.configure(http)) //
-//                .csrf(AbstractHttpConfigurer::disable)
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/authenticate", "/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
-//                        .requestMatchers(HttpMethod.GET, "/api/books/**").hasAnyRole("USER", "ADMIN")
-//                        .requestMatchers(HttpMethod.POST, "/api/books/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/api/books/**").hasRole("ADMIN")
-//                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").hasRole("ADMIN")
-//                        .anyRequest().authenticated()
-//                )
-
-                .cors(cors -> cors.configure(http)) //
-                .csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
-                        .requestMatchers("/authenticate").permitAll() //
-                        .requestMatchers( "/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/books/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/books/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/books/**").authenticated()
-
-                        // Fallback
-                        .anyRequest().authenticated()
-                )
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
-
-        return http.build();
-    }
-
-    @Bean
-    public InMemoryUserDetailsManager userDetailsService() {
-        PasswordEncoder encoder = passwordEncoder();
-
-        UserDetails user = User.builder()
-                .username("user")
-                .password(encoder.encode("password"))
-                .roles("USER")
-                .build();
-
-        UserDetails admin = User.builder()
-                .username("admin")
-                .password(encoder.encode("123"))
-                .roles("ADMIN")
-                .build();
-
-        return new InMemoryUserDetailsManager(user, admin);
-    }
-
-    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration)
+            throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-
     @Bean
-    public CorsFilter corsFilter() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:4200"));
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
-        config.setAllowCredentials(true);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .cors(cors -> cors.configure(http))
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        // Allow authentication endpoint
+                        .requestMatchers("/authenticate").permitAll()
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
+                        // Allow all Swagger/OpenAPI paths
+                        .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/swagger-ui/index.html").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "/v3/api-docs.yaml", "/v3/api-docs").permitAll()
+                        .requestMatchers("/swagger-resources/**", "/swagger-resources").permitAll()
+                        .requestMatchers("/configuration/ui", "/configuration/security").permitAll()
+                        .requestMatchers("/webjars/**").permitAll()
+                        .requestMatchers("/h2-console/**").permitAll()
+
+                        // Allow versioned API endpoints without authentication for testing
+                        .requestMatchers("/api/v1/**").permitAll()
+
+                        .anyRequest().authenticated())
+
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
     }
 }

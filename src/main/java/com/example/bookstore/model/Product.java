@@ -1,11 +1,9 @@
 package com.example.bookstore.model;
 
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
 
-import java.util.Objects;
 @Getter
 @Setter
 @Entity
@@ -19,6 +17,5 @@ public class Product {
     private int productId;
     private String productName;
     private double price;
-
 
 }

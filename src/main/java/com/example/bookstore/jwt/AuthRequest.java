@@ -14,6 +14,11 @@ public class AuthRequest {
     @Schema(description = "Password for login", example = "123")
     private String password;
 
+//	public String getUsername() {
+//		// TODO Auto-generated method stub
+//		return "admin";
+//	}
+
 //    public void setUsername(String username) {
 //        this.username = username;
 //    }

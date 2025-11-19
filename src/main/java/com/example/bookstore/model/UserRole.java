@@ -3,11 +3,15 @@ package com.example.bookstore.model;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Setter
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @Table(name = "userrole")
 public class UserRole {
@@ -17,27 +21,4 @@ public class UserRole {
 
     private String userrole;
 
-    // Constructors, Getters, and Setters
-    public UserRole() {}
-
-    public UserRole(String username, String userrole) {
-        this.username = username;
-        this.userrole = userrole;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getUserrole() {
-        return userrole;
-    }
-
-    public void setUserrole(String userrole) {
-        this.userrole = userrole;
-    }
 }
